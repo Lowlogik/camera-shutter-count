@@ -497,7 +497,7 @@ def read_shutter_result(debug: bool = False) -> dict:
     except Exception as exc:
         raise RuntimeError(f"Could not talk to Windows Portable Devices: {exc}") from exc
     if not candidates:
-        raise RuntimeError(not_found_message(still_image_paths()))
+        raise RuntimeError("No camera on USB.")
     last_error: Exception | None = None
     for path in candidates:
         if debug:
@@ -553,9 +553,7 @@ def read_shutter_result(debug: bool = False) -> dict:
                     if PTP_DPC_EOS_SHUTTER_RELEASE_COUNTER in found:
                         extra = f"\nSaw ShutterReleaseCounter={found[PTP_DPC_EOS_SHUTTER_RELEASE_COUNTER]:,}, but not the main counter."
                     raise RuntimeError(
-                        f"Connected to {model}, but it did not report a shutter count over USB.\n"
-                        "Close other camera software and Windows Photos, then retry.\n"
-                        + USB_UNLIKELY
+                        f"Connected to {model}, but it did not report a shutter count over USB."
                         + extra
                     )
 
@@ -759,6 +757,8 @@ def main() -> None:
     try:
         read_shutter_over_usb(debug=args.debug)
     except RuntimeError as exc:
+        if str(exc) == "No camera on USB.":
+            raise SystemExit(not_found_message(still_image_paths())) from exc
         raise SystemExit(str(exc)) from exc
 
 

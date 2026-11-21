@@ -2,12 +2,16 @@ $ErrorActionPreference = "Stop"
 Set-Location $PSScriptRoot
 
 python -m pip install -r requirements.txt
+python -m pip install pillow -q
+python make_icon.py
 python -m PyInstaller `
   --noconfirm `
   --clean `
   --onefile `
   --windowed `
   --name "Camera Shutter Count" `
+  --icon (Join-Path $PSScriptRoot "icon.ico") `
+  --add-data "icon.ico;." `
   --hidden-import shutter_count `
   --hidden-import cameras `
   --hidden-import comtypes `

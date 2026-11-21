@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Windows UI for Canon EOS shutter count over USB."""
+"""Windows UI for Camera Shutter Count (Canon EOS USB readout)."""
 
 from __future__ import annotations
 
@@ -19,13 +19,13 @@ OK = "#4ade80"
 ERR = "#f87171"
 FONT = "Segoe UI"
 DONATE_URL = "https://github.com/sponsors/patricktheroux-ops"
-REPO_URL = "https://github.com/patricktheroux-ops/canon-shutter-count"
+REPO_URL = "https://github.com/patricktheroux-ops/camera-shutter-count"
 
 
 class ShutterApp(tk.Tk):
     def __init__(self) -> None:
         super().__init__()
-        self.title("Canon Shutter Count")
+        self.title("Camera Shutter Count")
         self.configure(bg=BG)
         self.geometry("460x560")
         self.minsize(420, 520)
@@ -36,7 +36,7 @@ class ShutterApp(tk.Tk):
         self.after(400, self._read_if_present)
 
     def _build(self) -> None:
-        tk.Label(self, text="Canon shutter count", bg=BG, fg=FG, font=(FONT, 16, "bold")).pack(
+        tk.Label(self, text="Camera Shutter Count", bg=BG, fg=FG, font=(FONT, 16, "bold")).pack(
             anchor="w", padx=24, pady=(22, 2)
         )
         tk.Label(

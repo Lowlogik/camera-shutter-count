@@ -8,7 +8,7 @@ Canon does not put shutter count in most JPEG/CR2 files. This talks to the camer
 
 ## Download
 
-[**Canon Shutter Count.exe**](https://github.com/patricktheroux-ops/canon-shutter-count/releases/latest) — Windows 10/11.
+[**Camera Shutter Count.exe**](https://github.com/patricktheroux-ops/camera-shutter-count/releases/latest) — Windows 10/11.
 
 Windows may warn that the app is unsigned. That’s expected until it’s signed. Close EOS Utility / Photos, plug the camera in with a data cable, turn it **on**, then click **Read shutter count**.
 
@@ -47,7 +47,7 @@ Close EOS Utility, Photos, and Camera first. Use a data USB cable and turn the c
 .\build.ps1
 ```
 
-Writes `dist\Canon Shutter Count.exe`.
+Writes `dist\Camera Shutter Count.exe`.
 
 ## Sponsor
 

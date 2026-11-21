@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Windows UI for Camera Shutter Count (Canon EOS USB readout)."""
+"""Windows UI for Camera Shutter Count (USB shutter readout)."""
 
 from __future__ import annotations
 
@@ -41,7 +41,7 @@ class ShutterApp(tk.Tk):
         )
         tk.Label(
             self,
-            text="USB readout for Canon EOS. Tested on Rebel T7 / EOS 2000D.",
+            text="USB readout. Tested on Rebel T7. Want another camera? Open an issue.",
             bg=BG,
             fg=MUTED,
             font=(FONT, 10),
@@ -60,7 +60,7 @@ class ShutterApp(tk.Tk):
         tk.Label(card, textvariable=self.count_var, bg=CARD, fg=FG, font=(FONT, 36, "bold")).pack(
             anchor="w", padx=18
         )
-        self.life_var = tk.StringVar(value="Connect a Canon EOS body over USB")
+        self.life_var = tk.StringVar(value="Connect a camera over USB")
         tk.Label(card, textvariable=self.life_var, bg=CARD, fg=MUTED, font=(FONT, 10)).pack(
             anchor="w", padx=18, pady=(0, 8)
         )
@@ -96,8 +96,8 @@ class ShutterApp(tk.Tk):
         self._link(links, "Source", REPO_URL).pack(side="left")
 
         hint = (
-            "Close EOS Utility / Photos first. Use a data cable and a charged battery. "
-            "DIGIC 6+ bodies (80D, 5D IV, most R series) usually do not expose the count over USB."
+            "Close other camera software and Photos first. Use a data cable and a charged battery. "
+            "Some bodies do not expose the count over USB."
         )
         tk.Label(self, text=hint, bg=BG, fg=MUTED, font=(FONT, 9), wraplength=400, justify="left").pack(
             anchor="w", padx=24, pady=(8, 16)
@@ -119,9 +119,9 @@ class ShutterApp(tk.Tk):
 
     def _refresh_presence(self) -> None:
         if self._camera_present():
-            self.presence.configure(text="Canon camera detected on USB", fg=OK)
+            self.presence.configure(text="Camera detected on USB", fg=OK)
         else:
-            self.presence.configure(text="No Canon camera on USB", fg=ERR)
+            self.presence.configure(text="No camera on USB", fg=ERR)
         self.after(1500, self._refresh_presence)
 
     def _read_if_present(self) -> None:

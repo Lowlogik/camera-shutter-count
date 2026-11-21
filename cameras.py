@@ -1,8 +1,8 @@
-"""Canon EOS shutter ratings and USB readout notes.
+"""Shutter ratings and USB readout notes.
 
-Rated lives are Canon's published shutter durability figures, not a hard stop.
-USB readout of property 0xD1AC works on many DIGIC 4 / 5 / 5+ DSLRs.
-DIGIC 6 and newer typically refuse that property over USB.
+Rated lives are published shutter durability figures, not a hard stop.
+USB readout of property 0xD1AC works on many older DSLRs.
+Newer bodies often do not expose that property over USB.
 """
 
 from __future__ import annotations
@@ -77,14 +77,14 @@ _RATED_LIFE: tuple[tuple[str, int], ...] = (
 )
 
 USB_LIKELY = (
-    "DIGIC 4 / 5 / 5+ EOS DSLRs typically report the count over USB: "
-    "Rebel T3–T7, 2000D/1500D, 60D/70D, 7D/7D Mark II, 5D Mark II/III, and similar."
+    "Many older DSLRs typically report the count over USB, including Rebel T7. "
+    "Open a GitHub issue if you want another camera added."
 )
 
 USB_UNLIKELY = (
-    "Canon removed the USB shutter-count readout on DIGIC 6 and newer "
-    "(80D, 5D Mark IV, T6i/T6s, most EOS R / RP / R7 / R10, EOS M). "
-    "A Canon service centre can still read those bodies."
+    "This body did not report a shutter count over USB. "
+    "A service centre can still read some cameras that block this. "
+    "Open a GitHub issue if you want another model added."
 )
 
 

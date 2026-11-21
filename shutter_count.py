@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Read shutter count from a Canon EOS camera over USB (Windows WPD/MTP).
+"""Read shutter count from a camera over USB (Windows WPD/MTP).
 
-Most Canon bodies do not write the actuation count into JPEG/CR2 files.
-DIGIC 4 / 5 / 5+ DSLRs typically expose it over USB. DIGIC 6+ often do not.
+Most bodies do not write the actuation count into JPEG/CR2 files.
+Some cameras expose it over USB; others do not.
 
 Usage:
     python shutter_count.py
@@ -491,7 +491,7 @@ def pick_canon_paths(paths: list[str]) -> list[str]:
 
 
 def read_shutter_result(debug: bool = False) -> dict:
-    """Read shutter count from a connected Canon body. Raises RuntimeError on failure."""
+    """Read shutter count from a connected camera. Raises RuntimeError on failure."""
     try:
         candidates = wpd_canon_device_ids()
     except Exception as exc:
@@ -554,7 +554,7 @@ def read_shutter_result(debug: bool = False) -> dict:
                         extra = f"\nSaw ShutterReleaseCounter={found[PTP_DPC_EOS_SHUTTER_RELEASE_COUNTER]:,}, but not the main counter."
                     raise RuntimeError(
                         f"Connected to {model}, but it did not report a shutter count over USB.\n"
-                        "Close EOS Utility and Windows Photos, then retry.\n"
+                        "Close other camera software and Windows Photos, then retry.\n"
                         + USB_UNLIKELY
                         + extra
                     )
@@ -562,7 +562,7 @@ def read_shutter_result(debug: bool = False) -> dict:
                 rated = rated_life_for(model)
                 used = min(100.0, 100.0 * count / rated) if rated else None
                 return {
-                    "manufacturer": info.get("manufacturer") or "Canon",
+                    "manufacturer": info.get("manufacturer") or "",
                     "model": model,
                     "serial": info.get("serial") or "",
                     "firmware": info.get("version") or "",
@@ -584,7 +584,7 @@ def read_shutter_result(debug: bool = False) -> dict:
             cam.close()
     if last_error:
         raise RuntimeError(str(last_error))
-    raise RuntimeError("Found a Canon device, but it did not answer as a PTP camera.")
+    raise RuntimeError("Found a USB camera, but it did not answer as a PTP camera.")
 
 
 def read_shutter_over_usb(debug: bool = False) -> None:
@@ -596,13 +596,13 @@ def read_shutter_over_usb(debug: bool = False) -> None:
         print(f"Firmware:  {result['firmware']}")
     print(f"Shutter count: {result['count']:,}")
     if result["rated"] is not None and result["used_pct"] is not None:
-        print(f"Canon rating:  {result['rated']:,} actuations ({result['used_pct']:.1f}% of rated life)")
+        print(f"Rated life:    {result['rated']:,} actuations ({result['used_pct']:.1f}% of rated life)")
     print("IMG_#### file numbers are not the shutter count; they reset.")
 
 
 def try_photo(path: Path) -> None:
     print(
-        "A Rebel T7 / EOS 2000D does not store shutter count in JPEG or CR2 files.\n"
+        "A Rebel T7 does not store shutter count in JPEG or CR2 files.\n"
         "Connect the camera by USB and run:  python shutter_count.py"
     )
     if not path.exists():
@@ -626,7 +626,7 @@ def try_photo(path: Path) -> None:
 
 
 T7_CONNECT_HELP = """
-Windows does not see a Canon camera on USB. The script can only talk to a
+Windows does not see a camera on USB. The script can only talk to a
 device Windows has already enumerated.
 
 T7 checklist:
@@ -635,9 +635,8 @@ T7 checklist:
   3. Use a data cable, not a charge-only cable. Try another cable if unsure.
   4. Plug into a USB port on the PC, not a charging-only hub.
   5. Turn Wi-Fi off: Menu -> Wireless communication settings -> Wi-Fi/NFC -> Disable.
-  6. Close EOS Utility, Windows Photos, and Camera.
-  7. Confirm Device Manager -> Portable Devices (or Imaging devices) shows
-     "Canon EOS Rebel T7" / "EOS 2000D".
+  6. Close other camera software, Windows Photos, and Camera.
+  7. Confirm Device Manager -> Portable Devices (or Imaging devices) shows the camera.
 
 Then run:  python shutter_count.py --diagnose
 """.strip()
@@ -646,16 +645,16 @@ Then run:  python shutter_count.py --diagnose
 def not_found_message(still_paths: list[str]) -> str:
     usb = camera_usb_paths()
     wpd = camera_wpd_paths()
-    lines = ["No Canon PTP camera found."]
+    lines = ["No PTP camera found."]
     if usb:
-        lines.append("A Canon USB device is present, but not as a still-image/PTP interface:")
+        lines.append("A USB camera is present, but not as a still-image/PTP interface:")
         lines.extend(f"  {p}" for p in usb)
-        lines.append("Windows may be using a mass-storage or Canon EDSDK driver. Unplug, wait 5s, replug.")
+        lines.append("Windows may be using a mass-storage driver. Unplug, wait 5s, replug.")
     elif wpd:
-        lines.append("A Canon portable device is present (WPD), but PTP still-image is not exposed:")
+        lines.append("A portable device is present (WPD), but PTP still-image is not exposed:")
         lines.extend(f"  {p}" for p in wpd)
     elif still_paths:
-        lines.append("Other still-image devices are present (printers/scanners), but no Canon USB camera.")
+        lines.append("Other still-image devices are present (printers/scanners), but no USB camera.")
     lines.append("")
     lines.append(T7_CONNECT_HELP)
     return "\n".join(lines)
@@ -667,25 +666,25 @@ def _print_paths(title: str, paths: list[str]) -> None:
         print("  (none)")
         return
     for path in paths:
-        mark = "  [Canon]" if CANON_VID in path.upper() else ""
+        mark = "  [camera]" if CANON_VID in path.upper() else ""
         print(f"  {path}{mark}")
 
 
 def list_devices() -> None:
     _print_paths("Still-image / PTP devices:", still_image_paths())
-    _print_paths("Canon USB devices:", camera_usb_paths())
-    _print_paths("Canon WPD (portable) devices:", camera_wpd_paths())
+    _print_paths("USB camera devices:", camera_usb_paths())
+    _print_paths("WPD (portable) devices:", camera_wpd_paths())
 
 
 def diagnose() -> None:
     import subprocess
 
     list_devices()
-    print("\nWindows PnP (Canon / Image / WPD / Camera):")
+    print("\nWindows PnP (Image / WPD / Camera):")
     cmd = (
         "Get-PnpDevice | Where-Object { "
         "$_.InstanceId -match 'VID_04A9' -or $_.Class -in @('Image','WPD','Camera') "
-        "-or $_.FriendlyName -match 'Canon|EOS|Rebel|2000D|T7' "
+        "-or $_.FriendlyName -match 'Rebel|2000D|T7' "
         "} | Select-Object Status, Class, FriendlyName, InstanceId | Format-Table -AutoSize | Out-String -Width 220"
     )
     result = subprocess.run(
@@ -715,13 +714,13 @@ def watch_usb(seconds: int) -> None:
         removed = prev - now
         for path in sorted(added):
             saw_change = True
-            tag = "Canon" if CANON_VID in path.upper() else "USB"
+            tag = "camera" if CANON_VID in path.upper() else "USB"
             print(f"+ [{tag}] {path}")
         for path in sorted(removed):
             saw_change = True
             print(f"- {path}")
         if any(CANON_VID in path.upper() for path in added):
-            print("\nCanon USB device appeared. Run:\n  python C:\\Users\\Patri\\shutter_count.py")
+            print("\nUSB camera appeared. Run:\n  python shutter_count.py")
             return
         prev = now
     if not saw_change:
@@ -732,11 +731,11 @@ def watch_usb(seconds: int) -> None:
             "The T7 Mini-USB port is the one with the USB trident icon, not HDMI."
         )
     else:
-        print("\nUSB devices changed, but none were Canon (VID_04A9).")
+        print("\nUSB devices changed, but none matched a known camera vendor ID.")
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Read Canon Rebel T7 shutter count over USB")
+    parser = argparse.ArgumentParser(description="Read camera shutter count over USB")
     parser.add_argument("--list", action="store_true", help="List connected PTP/USB/WPD devices")
     parser.add_argument("--diagnose", action="store_true", help="Show what Windows currently sees")
     parser.add_argument("--watch", nargs="?", const=90, type=int, metavar="SECONDS", help="Watch for a USB plug-in")

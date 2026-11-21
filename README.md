@@ -6,6 +6,12 @@ Windows app that reads the shutter actuation count from a **Canon EOS** camera o
 
 Canon does not put shutter count in most JPEG/CR2 files. This talks to the camera through Windows Portable Devices (the same WPD/MTP stack Explorer uses). No WinUSB driver swap.
 
+## Download
+
+[**Canon Shutter Count.exe**](https://github.com/patricktheroux-ops/canon-shutter-count/releases/latest) — Windows 10/11.
+
+Windows may warn that the app is unsigned. That’s expected until it’s signed. Close EOS Utility / Photos, plug the camera in with a data cable, turn it **on**, then click **Read shutter count**.
+
 ## Tested
 
 - Canon EOS Rebel T7 / EOS 2000D / Kiss X90 (firmware 1.1.0), Windows 11

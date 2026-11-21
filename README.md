@@ -1,4 +1,4 @@
-# Canon Shutter Count
+# Camera Shutter Count
 
 Windows app that reads the shutter actuation count from a **Canon EOS** camera over USB.
 
